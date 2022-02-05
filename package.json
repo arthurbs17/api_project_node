@@ -1,0 +1,16 @@
+{
+  "name": "project-api",
+  "version": "1.0.0",
+  "description": "Micro service de autenticaçao",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "author": "Arthur Sarmento",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.15"
+  }
+}
