@@ -1,5 +1,6 @@
 import db from "../db";
 import User from "../models/user.model";
+import DatabaseError from "../models/errors/database.error.model";
 
 class UserRepository {
   async findAllUsers(): Promise<User[]> {
@@ -14,7 +15,8 @@ class UserRepository {
   }
 
   async findById(uuid: string): Promise<User> {
-    const query = `
+    try {
+      const query = `
       SELECT
         uuid, username
       FROM
@@ -23,11 +25,56 @@ class UserRepository {
         uuid = $1
     `;
 
-    const values = [uuid];
-    const { rows } = await db.query<User>(query, values);
-    const [user] = rows;
+      const values = [uuid];
+      const { rows } = await db.query<User>(query, values);
+      const [user] = rows;
 
-    return user;
+      return user;
+    } catch (error) {
+      throw new DatabaseError("Error na requisição por ID!", error);
+    }
+  }
+
+  async createUser(user: User): Promise<User> {
+    const query = `
+      INSERT INTO
+        application_user (username, password)
+      VALUES
+        ($1, crypt($2, 'my_salt'))
+      RETURNING uuid, username
+    `;
+
+    const values = [user.username, user.password];
+
+    const { rows } = await db.query<User>(query, values);
+    const [newUser] = rows;
+
+    return newUser;
+  }
+
+  async updateUser(user: User): Promise<void> {
+    const query = `
+      UPDATE application_user
+      SET
+        username = $1,
+        password = crypt($2, 'my_salt')
+      WHERE
+        uuid = $3
+    `;
+
+    const values = [user.username, user.password, user.uuid];
+    await db.query(query, values);
+  }
+
+  async deleteUser(uuid: string): Promise<void> {
+    const query = `
+      DELETE FROM 
+        application_user
+      WHERE
+        uuid = $1
+    `;
+    const values = [uuid];
+    await db.query(query, values);
   }
 }
 
