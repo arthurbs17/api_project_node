@@ -1,11 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
+import bearerAuthenticationMiddleware from "../middlewares/bearer.authentication.middleware";
 import userRepository from "../repositories/user.repository";
 
 const usersRoute = Router();
 
 usersRoute.get(
   "/users",
+  bearerAuthenticationMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     const users = await userRepository.findAllUsers();
     res.status(StatusCodes.OK).json(users);
@@ -14,6 +16,7 @@ usersRoute.get(
 
 usersRoute.get(
   "/users/:uuid",
+  bearerAuthenticationMiddleware,
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     try {
       const uuid = req.params.uuid;
@@ -37,6 +40,7 @@ usersRoute.post(
 
 usersRoute.put(
   "/users/:uuid",
+  bearerAuthenticationMiddleware,
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     const uuid = req.params.uuid;
     const attUser = req.body;
@@ -51,6 +55,7 @@ usersRoute.put(
 
 usersRoute.delete(
   "/users/:uuid",
+  bearerAuthenticationMiddleware,
   async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     const uuid = req.params.uuid;
     await userRepository.deleteUser(uuid);

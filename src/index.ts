@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(statusRoute);
-app.use(bearerAuthenticationMiddleware, usersRoute);
+app.use(usersRoute);
 app.use(authorizationRoute);
 
 app.use(errorHandler);
